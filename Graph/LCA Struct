@@ -1,0 +1,64 @@
+vector<vector<int> > grid;
+struct LCA {
+    int n, lg, timer;
+    vector<int> tin, tout, depth, par, sz;
+    vector<vector<int> > up;
+
+    void dfs(int v, int p) {
+        tin[v] = ++timer;
+        up[v][0] = p;
+        par[v] = p == v ? v : p;
+        sz[v] = 1;
+        depth[v] = p == 0 ? 0 : depth[p] + 1;
+        for (int i = 1; i <= lg; ++i)
+            up[v][i] = up[up[v][i - 1]][i - 1];
+
+        for (auto &u: grid[v]) {
+            if (u != p) dfs(u, v), par[u] = v, sz[v] += sz[u];
+        }
+        tout[v] = ++timer;
+    }
+
+    bool is_ancestor(int u, int v) {
+        return tin[u] <= tin[v] && tout[u] >= tout[v];
+    }
+
+
+    int get_distance(int u, int v) {
+        return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+    }
+
+    int lca(int u, int v) {
+        if (is_ancestor(u, v))
+            return u;
+        if (is_ancestor(v, u))
+            return v;
+        for (int i = lg; i >= 0; --i) {
+            if (!is_ancestor(up[u][i], v))
+                u = up[u][i];
+        }
+        return up[u][0];
+    }
+
+
+    int kth_parent(int u, int k) {
+        if (k > par.size()) { return -1; }
+        int at = u;
+        for (int pow = 0; pow <= lg; pow++) {
+            if ((k & (1 << pow)) != 0) {
+                at = up[at][pow];
+                if (at == -1) break;
+            }
+        }
+        return at;
+    }
+
+
+    void init(int root) {
+        n = (int) grid.size(), timer = 0, lg = ceil(log2(n));
+        tin = tout = par = sz = depth = vector<int>(n);
+        up.assign(n, vector<int>(lg + 1, 0));
+        dfs(root, root);
+    }
+};
+

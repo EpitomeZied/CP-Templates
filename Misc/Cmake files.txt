@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.16)  # or your installed version
+project(CF_2)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_executable(CF_2 main.cpp)
+
+# Definitions
+add_definitions(-DClion)
+
+# GCC/Clang optimizations
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-O3 -Ofast -funroll-loops -march=haswell)  # AVX2 support
+endif()
+
+# Stack size (only works on MinGW)
+if (MINGW)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,1000000000")
+endif()
