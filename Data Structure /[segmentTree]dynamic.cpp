@@ -1,3 +1,4 @@
+// 1-idx
 int arr[N];
 extern struct node *const EMPTY;
 
